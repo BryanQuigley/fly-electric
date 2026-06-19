@@ -152,7 +152,7 @@
 		align-items: center;
 
 		h3 {
-			font-family: Inter;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 			font-size: 14px;
 			font-weight: 600;
 			line-height: 17px;
