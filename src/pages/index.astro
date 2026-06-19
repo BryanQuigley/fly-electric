@@ -1,0 +1,111 @@
+---
+import Layout from '/src/layouts/Layout.astro';
+import Intro from '/src/components/Intro.svelte';
+import Map from '/src/components/Map.svelte';
+import RangeSlider from '/src/components/RangeSlider.svelte';
+import Summary from '/src/components/Summary.svelte';
+import Sidebar from '/src/components/Sidebar.svelte';
+import Footer from '/src/components/Footer.astro';
+
+import map from '/src/data/states-contiguous-albers-10m.json';
+import airports from '/src/data/airports.json';
+---
+
+<Layout title="What electric plane range is needed to electrify US Domestic air travel?">
+	<main>
+		<div id="logo"> 
+			Logo
+		</div>
+		<section id="intro">
+			<Intro client:idle />
+		</section>
+
+		<section id="summary">
+			<Summary client:load />
+		</section>
+
+		<section id="controls">
+			<RangeSlider client:load />
+		</section>
+
+		<section id="visualization">
+			<div id="left">
+				<Sidebar client:idle />
+			</div>
+			<div id="right">
+				<Map 
+					map={map} 
+					airports={airports}
+					client:idle 
+				/>
+			</div>
+		</section>
+		
+		<Footer />
+	</main>
+</Layout>
+
+<style lang="scss">
+	main {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.75rem;
+		background: #fff;
+		width: 100vw;
+		min-width: 850px;
+	}
+
+	#logo {
+		top: 22px;
+		left: 24px;
+		position: absolute;
+	}
+
+	section {
+		padding-left: 1.25rem;
+		padding-right: 1.25rem;
+		box-sizing: border-box;
+	}
+
+	#intro {
+		display: flex;
+		width: 100%;
+		padding: 100px 1rem 80px 1rem;
+		background: #FAFAFA;
+		justify-content: center;
+	}
+
+	#summary, footer {
+		min-width: 750px;
+		max-width: 850px;
+	}
+
+	#summary {
+		// position: sticky;
+		// top: 0;
+		// background-color: #fff;
+	}
+
+	#controls, #visualization {
+		max-width: 1020px;
+		display: flex;
+		width: 100%;
+	}
+
+	#controls {
+		flex-direction: column;
+	}
+
+	#visualization {
+		flex-direction: row;
+		align-items: stretch;
+		margin-top: 35px;
+		
+		#right {
+			flex-grow: 1;
+			margin-right: -15px;
+		}
+	}
+
+</style>

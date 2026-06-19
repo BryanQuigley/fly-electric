@@ -1,0 +1,96 @@
+---
+import '/styles/reset.css';
+import 'svooltip/styles.css';
+import "inter-ui/inter.css";
+
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+
+		<meta name="description" content="Explore the range needed to electrify air travel on this interactive map" />
+		<meta name="og:title" content={title} />
+		<meta name="og:description" content="Explore the range needed to electrify air travel on this interactive map" />
+    <meta property="og:image" content="https://examplesite.com/social-card.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="https://examplesite.com" />
+    <meta property="twitter:url" content="https://examplesite.com" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content="Explore the range needed to electrify air travel on this interactive map" />
+    <meta name="twitter:image" content="https://examplesite.com/social-card.jpg" />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+<style is:global lang="scss">
+	
+	:root {
+		--accent: 124, 58, 237;
+		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), #da62c4 30%, white 60%);
+		
+		--neutral-900: #18181B;
+		--neutral-700: #3F3F46;
+		--neutral-500: #71717A;
+		--neutral-400: #A1A1AA;
+		--neutral-300: #D4D4D8;
+		--neutral-200: #E4E4E7;
+		--neutral-50: #FAFAFA;
+
+		--primary-direct: #3876FF;
+		--primary-layover: #E7760E;
+
+		--svooltip-bg: var(--neutral-700);
+		--svooltip-text: #FFF;
+		--svooltip-padding: 5px 7px;
+		--svooltip-weight: 400;
+		--svooltip-text-size: 14px;
+		--svooltip-shadow: none;
+		--svooltip-arrow-size: 0px;
+	}
+
+	html {
+		font-family: "Inter", "system-ui";
+		background-color: #F6F6F6;
+		font-size: 14px;
+		font-feature-settings: "ss01"; // alternative digits
+		font-feature-settings: "tnum"; // tabular numbers
+	}
+
+	@supports (font-variation-settings: normal) {
+		html { font-family: "Inter var", "system-ui"; }
+	}
+
+	.svooltip {
+		max-width: 20em;
+	}
+
+	.svooltip-content {
+		display: flex;
+		flex-direction: column;
+		justify-items: center;
+		gap: .25em;
+
+		img { 
+			max-width: 200px;
+		}
+	}
+
+	sub {
+		vertical-align: sub;
+		font-size: .6em;
+		font-weight: 500;
+	}
+
+</style>
