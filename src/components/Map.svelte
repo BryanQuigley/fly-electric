@@ -3,7 +3,7 @@
 	// I wanted to try out server-side rendering but also interactivity
 	// It's based on https://github.com/Rich-Harris/svelte-d3-arc-demo
 
-	import { range, visibleSpokes, includeLayovers, selectedAirport } from "/src/lib/stores.js";
+	import { range, visibleSpokes, includeLayovers, selectedAirport } from "../lib/stores.js";
 	import { tooltip } from 'svooltip';
 
 	import * as d3 from "d3";

@@ -1,5 +1,5 @@
 <script>
-	import { includeLayovers } from "/src/lib/stores";
+	import { includeLayovers } from "../lib/stores";
 
 	export let referenceFlights;
 	export let directFlights;

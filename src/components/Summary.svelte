@@ -1,6 +1,6 @@
 <script>
-	import { range, spokes, visibleSpokes, selectedAirport } from "/src/lib/stores.js";
-	import { roundPercentage, formatNumber } from "/src/lib/utils.js";
+	import { range, spokes, visibleSpokes, selectedAirport } from "../lib/stores.js";
+	import { roundPercentage, formatNumber } from "../lib/utils.js";
 </script>
 
 <p>

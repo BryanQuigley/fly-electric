@@ -1,5 +1,5 @@
 <script>
-	import { includeLayovers } from "/src/lib/stores.js";
+	import { includeLayovers } from "../lib/stores.js";
 	let checked = $includeLayovers;
 	$: includeLayovers.set(checked);
 </script>

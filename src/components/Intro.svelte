@@ -1,7 +1,7 @@
 <script>
 import { tooltip } from 'svooltip';
-import { formatNumber } from '/src/lib/utils';
-import { spokes } from '/src/lib/stores';
+import { formatNumber } from '../lib/utils';
+import { spokes } from '../lib/stores';
 import { get } from 'svelte/store';
 
 // retrieve overall flights data once

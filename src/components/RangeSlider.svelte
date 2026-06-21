@@ -1,7 +1,7 @@
 <script>
 	import LayoverCheckbox from "/src/components/LayoverCheckbox.svelte";
 
-	import { range } from "/src/lib/stores";
+	import { range } from "../lib/stores";
 	import { scalePow } from 'd3';
   import { onMount } from "svelte";
 	import { draggable } from '@neodrag/svelte'
