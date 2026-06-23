@@ -1,14 +1,10 @@
 <script>
 	import { includeLayovers } from "../lib/stores";
 
-	export let referenceFlights;
-	export let directFlights;
-	export let layoverFlights;
+	let { referenceFlights, directFlights, layoverFlights } = $props();
 
-	let directPercentage, layoverPercentage;
-
-	$: directPercentage = directFlights / referenceFlights * 100;
-	$: layoverPercentage = $includeLayovers ? layoverFlights / referenceFlights * 100 : 0;
+	let directPercentage = $derived(directFlights / referenceFlights * 100);
+	let layoverPercentage = $derived($includeLayovers ? layoverFlights / referenceFlights * 100 : 0);
 
 	function oorOpacity(percentage) {
 		// map: 90 => 0

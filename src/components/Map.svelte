@@ -9,8 +9,7 @@
 	import * as d3 from "d3";
 	import { mesh, feature } from "topojson-client";
 	
-	export let map;
-	export let airports;
+	let { map, airports } = $props();
 
 	const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
 	const path = d3.geoPath();
@@ -65,7 +64,7 @@
 
 </script>
 
-<div on:click={unlockAirport}>
+	<div onclick={unlockAirport} role="button" aria-label="Deselect airport">
 	<svg viewBox='18 13 940 595' preserveAspectRatio="xMinYMin meet" id="airports">
 		<!-- Continental US Geography -->
 		<g fill="none" stroke-linejoin="round" stroke-linecap="round">
@@ -92,9 +91,12 @@
 				<circle 
 					cx="{projection(airport.geometry.coordinates)[0]}" 
 					cy="{projection(airport.geometry.coordinates)[1]}" 
-					r="2.25"
-					on:click|capture|stopPropagation={ () => lockAirport(airport.properties.iata_code) }
+					r={airport.properties.iata_code === $selectedAirport ? "4" : "2.25"}
+					onclick={(e) => { e.stopPropagation(); lockAirport(airport.properties.iata_code); }}
 					class:selected={ airport.properties.iata_code === $selectedAirport }
+					onkeydown={(e) => e.key === 'Enter' && lockAirport(airport.properties.iata_code)}
+					role="button"
+					tabindex="0"
 					use:tooltip={{
 						...tooltipOptions,
 						content: airport.properties.iata_code
@@ -135,7 +137,6 @@
 
     #airports circle.selected {
         fill: rgba(0,0,0,.7);
-        transition: r .25s cubic-bezier(0.65, -0.08, 0.24, 2);
-        r: 4;
+        transition: fill .25s;
     }
 </style>

@@ -1,7 +1,9 @@
 <script>
 	import { includeLayovers } from "../lib/stores.js";
-	let checked = $includeLayovers;
-	$: includeLayovers.set(checked);
+	let checked = $state($includeLayovers);
+	$effect(() => {
+		includeLayovers.set(checked);
+	});
 </script>
 
 <label class="form-control">

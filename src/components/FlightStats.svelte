@@ -1,10 +1,7 @@
 <script>
 	import { formatNumber } from "../lib/utils";
 
-	export let label;
-	export let color;
-	export let passengers;
-	export let flights;
+	let { label, color, passengers, flights } = $props();
 </script>
 
 <div>

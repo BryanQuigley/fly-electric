@@ -11,14 +11,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/svelte": "^4.0.4",
-    "@neodrag/svelte": "^2.0.1",
-    "astro": "^3.6.4",
+    "@astrojs/svelte": "^9.0.0",
+    "@neodrag/svelte": "^2.3.3",
+    "astro": "^7.0.0",
     "d3": "^7.9.0",
-    "svelte": "^3.54.0",
+    "svelte": "^5.43.6",
     "topojson-client": "^3.1.0"
   },
   "devDependencies": {
-    "svooltip": "^0.5.0"
+    "svooltip": "^0.9.0"
   }
 }

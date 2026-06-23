@@ -89,7 +89,7 @@
 	const planeIcon = '<svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.5469 5C12.3438 5 13.75 5.67969 13.75 6.5C13.75 7.34375 12.3438 8 11.5469 8H8.80469L6.46094 12.125C6.32031 12.3594 6.0625 12.5 5.80469 12.5H4.49219C4.23438 12.5 4.04688 12.2656 4.11719 12.0312L5.26562 8H2.875L1.84375 9.35938C1.77344 9.45312 1.67969 9.5 1.5625 9.5H0.578125C0.390625 9.5 0.25 9.35938 0.25 9.17188C0.25 9.14844 0.25 9.125 0.25 9.10156L1 6.5L0.25 3.92188C0.25 3.89844 0.25 3.875 0.25 3.82812C0.25 3.66406 0.390625 3.5 0.578125 3.5H1.5625C1.67969 3.5 1.77344 3.57031 1.84375 3.66406L2.875 5H5.26562L4.11719 0.992188C4.04688 0.757812 4.23438 0.5 4.49219 0.5H5.80469C6.0625 0.5 6.32031 0.664062 6.46094 0.898438L8.80469 5H11.5469Z" fill="white"/></svg>';
 </script>
 
-<svelte:window on:resize={positionHandle} />
+<svelte:window onresize={positionHandle} />
 
 <div>
 	<div id="title-row">
@@ -99,7 +99,7 @@
 				<path d="M9.89062 5.03906L10.4297 4.5L9.89062 3.98438L6.51562 0.609375L6 0.0703125L4.92188 1.125L5.46094 1.66406L7.54688 3.75H0.75H0V5.25H0.75H7.54688L5.46094 7.35938L4.92188 7.875L6 8.95312L6.51562 8.41406L9.89062 5.03906Z" fill="black"/>
 			</svg>				
 		</h3>
-		<LayoverCheckbox client:load />
+		<LayoverCheckbox />
 	</div>
 	
 	<div id="track" bind:this={track}>
@@ -125,7 +125,7 @@
 					style="margin-left: {tick.x}%;" 
 					class="tick" 
 					class:plane="{tick.class==='plane'}"
-					on:click={setRange(tick.range)}
+					onclick={() => setRange(tick.range)}
 				>
 					{#if tick.tooltip}
 						<span>{tick.label}</span>

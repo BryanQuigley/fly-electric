@@ -63,8 +63,7 @@ const { title } = Astro.props;
 		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 		background-color: #F6F6F6;
 		font-size: 14px;
-		font-feature-settings: "ss01"; // alternative digits
-		font-feature-settings: "tnum"; // tabular numbers
+		font-feature-settings: "ss01" on, "tnum" on;
 	}
 
 	.svooltip {
@@ -76,10 +75,10 @@ const { title } = Astro.props;
 		flex-direction: column;
 		justify-items: center;
 		gap: .25em;
+	}
 
-		img { 
-			max-width: 200px;
-		}
+	.svooltip-content img {
+		max-width: 200px;
 	}
 
 	sub {
