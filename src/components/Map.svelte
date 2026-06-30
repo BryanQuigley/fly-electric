@@ -3,7 +3,7 @@
 	// I wanted to try out server-side rendering but also interactivity
 	// It's based on https://github.com/Rich-Harris/svelte-d3-arc-demo
 
-	import { range, visibleSpokes, includeLayovers, selectedAirport } from "../lib/stores.js";
+	import { range, visibleSpokes, selectedAirport } from "../lib/stores.js";
 	import { tooltip } from 'svooltip';
 
 	import * as d3 from "d3";
@@ -31,11 +31,8 @@
 		$selectedAirport = undefined;
 	}
 	
-	// color spokes depending on class
-	function spokeColor({properties}, includeLayovers) {
-		// can be replaced direct
+	function spokeColor({properties}) {
 		if(properties.DISTANCE <= $range) return '#61A0FF';
-		// can be replaced with 1 layover
 		return '#FF8A00';
 	}
 
@@ -77,7 +74,7 @@
 			{#each $visibleSpokes.spokes as spoke (spoke.id)}
 			<path 
 				class="spoke"
-				stroke="{spokeColor(spoke, $includeLayovers)}" 
+				stroke="{spokeColor(spoke)}" 
 				stroke-width="{ spokeWidthScale(spoke.properties.DEPARTURES_PERFORMED) + spokeWidthModifier($range) }"
 				stroke-opacity="{ spokeOpacity(spoke.properties.PASSENGERS) }"
 				d="{pathProjected(spoke)}"

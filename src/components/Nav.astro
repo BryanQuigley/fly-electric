@@ -1,0 +1,78 @@
+---
+---
+
+<nav>
+  <a href="/" class="logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    Green Flight Plan
+  </a>
+  <div class="links">
+    <a href="/#tax">Tax Leaded Fuel</a>
+    <a href="/#electric">Electrify</a>
+    <a href="/#saf">SAF</a>
+    <a href="/#take-action">Take Action</a>
+    <a href="/about" class="about-link">About</a>
+  </div>
+</nav>
+
+<style>
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 52px;
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 17px;
+    color: #1B5E2A;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .logo svg {
+    color: #2D9D4E;
+  }
+
+  .links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--neutral-500);
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    color: var(--neutral-900);
+  }
+
+  .about-link {
+    padding: 4px 10px;
+    border: 1px solid var(--neutral-300);
+    border-radius: 20px;
+    font-size: 12px !important;
+  }
+
+  .about-link:hover {
+    border-color: var(--neutral-500);
+  }
+</style>

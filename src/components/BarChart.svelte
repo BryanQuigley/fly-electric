@@ -1,21 +1,14 @@
 <script>
-	import { includeLayovers } from "../lib/stores";
-
-	let { referenceFlights, directFlights, layoverFlights } = $props();
+	let { referenceFlights, directFlights } = $props();
 
 	let directPercentage = $derived(directFlights / referenceFlights * 100);
-	let layoverPercentage = $derived($includeLayovers ? layoverFlights / referenceFlights * 100 : 0);
 
 	function oorOpacity(percentage) {
-		// map: 90 => 0
-		// map: 85 => 1
 		if(percentage <= 85) return 1;
 		return (90 - percentage) / 5;
 	}
 
 	function flightLabelOpacity(percentage) {
-		// map: 5 => 1
-		// map: 4 => 0
 		if(percentage >= 5) return 1;
 		return (percentage - 4) / 2;
 	}
@@ -23,14 +16,9 @@
 
 <div id="container">
 	<div id="chart">
-		<div id="outofrange" style="opacity: {oorOpacity(layoverPercentage+directPercentage)};">
+		<div id="outofrange" style="opacity: {oorOpacity(directPercentage)};">
 			<span>Out of range</span>
 		</div>
-		{#if $includeLayovers}
-			<div id="layover" style="height: {layoverPercentage}%;">
-				<span style="opacity: {flightLabelOpacity(layoverPercentage)};">{Math.round(layoverPercentage)}%</span>
-		</div>
-		{/if}
 		<div id="direct" style="height: {directPercentage}%;">
 			<span style="opacity: {flightLabelOpacity(directPercentage)};">{Math.round(directPercentage)}%</span>
 		</div>
@@ -62,15 +50,14 @@
 		overflow: hidden;
 	}
 		
-	#layover, #direct, #outofrange {
+	#direct, #outofrange {
 		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	/* Flatted span styling inside the chart segments */
-	#layover span, #direct span, #outofrange span {
+	#direct span, #outofrange span {
 		text-align: center;
 		color: #FFF;
 		font-size: 12px;
@@ -84,7 +71,6 @@
 	}
 
 	#direct { background-color: var(--primary-direct); }
-	#layover { background-color: var(--primary-layover); }
 
 	#outofrange {
 		flex-grow: 1;

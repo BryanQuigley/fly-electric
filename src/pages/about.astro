@@ -1,0 +1,219 @@
+---
+import Layout from '/src/layouts/Layout.astro';
+import Nav from '/src/components/Nav.astro';
+import fs from 'node:fs';
+
+const csvRaw = fs.readFileSync('src/data/lead-tax-scenarios.csv', 'utf-8').trim();
+const lines = csvRaw.split('\n').slice(1);
+const rows = lines.map(l => {
+  const [scenario, year, fee, demand, revenue, ...behaviorParts] = l.split(',');
+  return {
+    scenario,
+    year: parseInt(year),
+    fee: parseFloat(fee),
+    demand: parseFloat(demand),
+    revenue: parseFloat(revenue),
+    behavior: behaviorParts.join(',').replace(/^"|"$/g, ''),
+  };
+});
+
+const scenarios = { soft: [], rapid: [], notax: [] };
+for (const r of rows) scenarios[r.scenario].push(r);
+
+const scenarioMeta = {
+  notax: { label: 'No Tax — Business as Usual', color: '#999999', desc: 'Voluntary transition, no price signal. Without a fee, demand barely budges.' },
+  soft: { label: 'Soft Landing — UL94 Dominance', color: '#D94A4A', desc: '100-octane unleaded takes time to reach every airport. High-performance planes keep burning 100LL longer.' },
+  rapid: { label: 'Rapid Collapse — Drop-in Unleaded', color: '#7A1A1A', desc: 'A drop-in replacement (G100UL, 100R) is widely adopted. The fee makes 100LL economically toxic.' },
+};
+---
+
+<Layout title="About — Green Flight Plan">
+  <Nav />
+
+  <main>
+    <section id="about">
+      <div class="content">
+        <a href="/" class="back">&larr; Back to the map</a>
+
+        <h2>About this site</h2>
+
+        <p class="lede">
+          Cleaning up aviation needs three things to happen at once — and this site is a
+          visual argument for all three.
+        </p>
+
+        <div class="pillars">
+          <div class="pillar" style="border-left-color: #D94A4A;">
+            <h3>1. Tax leaded aviation fuel</h3>
+            <p>Avgas 100LL is the last leaded fuel sold in the US. A modest tax would protect public health,
+            create a market signal for unleaded alternatives, and raise revenue for the transition.</p>
+          </div>
+          <div class="pillar" style="border-left-color: var(--primary-direct);">
+            <h3>2. Electrify short-haul flights</h3>
+            <p>Battery-electric planes are ready for short routes today. The interactive map on the homepage
+            lets you explore exactly how many flights and how much CO₂ could be eliminated at any given range.</p>
+          </div>
+          <div class="pillar" style="border-left-color: #2D9D4E;">
+            <h3>3. Scale SAF for long distance</h3>
+            <p>For routes batteries can&rsquo;t reach, sustainable aviation fuel is a drop-in solution
+            that cuts lifecycle emissions 50–80%. Policy and investment can bring it to scale.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="content">
+        <h2>Lead-tax scenarios</h2>
+        <p class="lede">
+          These are illustrative scenarios, not predictions. They show how a rising $1/gal fee
+          on 100LL could play out depending on how quickly unleaded alternatives reach the market.
+          Data is editable in <code>src/data/lead-tax-scenarios.csv</code>.
+        </p>
+
+        {Object.entries(scenarioMeta).map(([key, meta]) => {
+          const data = scenarios[key];
+          const totalRev = data.reduce((s, r) => s + r.revenue, 0);
+          return (
+            <div class="scenario-block" style={`border-left-color: ${meta.color}`}>
+              <h3>{meta.label}</h3>
+              <p>{meta.desc}</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      {data[0].fee > 0 && <th>Fee/gal</th>}
+                      <th>100LL Demand</th>
+                      {data[0].fee > 0 && <th>Est. Revenue</th>}
+                      <th>Market Behavior</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.map(r => (
+                      <tr>
+                        <td>{r.year}</td>
+                        {r.fee > 0 && <td>\${r.fee.toFixed(2)}</td>}
+                        <td>{r.demand}%</td>
+                        {r.fee > 0 && <td>\${r.revenue}M</td>}
+                        <td>{r.behavior}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {totalRev > 0 && <p class="rev-total">Cumulative revenue: ~\${Math.round(totalRev)}M</p>}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <section id="methodology">
+      <div class="content">
+        <h2>Methodology</h2>
+
+        <p>
+          We used flights data from <a href="https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FIM">BTS T-100 Domestic Segment (U.S. Carriers)</a>
+          data from August 2022. We considered only non-empty Passenger flights (Service Class F)
+          in the contiguous United States, carried out by the biggest US air carriers (as defined
+          by BTS as "Certified U.S. air carriers that account for at least one percent of domestic
+          scheduled passenger revenues"). Airport data is from <a href="https://ourairports.com/data/">OurAirports</a>. We only considered
+          medium-size and large airports with scheduled service.
+        </p>
+
+        <p>
+          Spoke distances were calculated using airport distance and do not take into account actual flight paths.
+          We considered spokes "replaceable with one additional layover" at a range R if there is at least one
+          intermediate airport that can reach the spoke's origin and destination within the range R.
+        </p>
+
+        <p>
+          Emissions were approximated at 144.2g CO₂ per-seat-per-mile based on the
+          <a href="https://www.iba.aero/news/aviation-emissions-rise-slightly-iba-data-shows/">IBA Aviation Carbon Emissions Index</a>.
+          We calculated emissions based on passenger count and spoke distance. This does not take into account
+          actual flight paths, empty seats, aircraft or engine types, or secondary effects like contrails.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p><a href="/">&larr; Back to Green Flight Plan</a></p>
+  </footer>
+</Layout>
+
+<style>
+  main { display: flex; flex-direction: column; align-items: center; }
+
+  section {
+    padding: 4rem 1.25rem; display: flex; justify-content: center;
+    width: 100%; box-sizing: border-box;
+  }
+
+  #about { background: #FAFAFA; }
+  #scenarios { background: #fff; }
+  #methodology { background: #FAFAFA; }
+
+  .content { max-width: 680px; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .back { font-size: 0.875rem; color: var(--neutral-500); text-decoration: none; }
+  .back:hover { color: var(--neutral-900); }
+
+  h2 { font-size: 2rem; font-weight: 500; color: var(--neutral-900); letter-spacing: -0.02em; margin: 0; }
+
+  .lede { font-size: 1.125rem; line-height: 1.6; color: var(--neutral-700); margin: 0; }
+
+  .lede code {
+    background: var(--neutral-200); padding: 1px 5px; border-radius: 3px; font-size: 0.95rem;
+  }
+
+  .pillars { display: flex; flex-direction: column; gap: 1rem; }
+
+  .pillar {
+    border-left: 4px solid; padding: 1rem 1.25rem;
+    background: #fff; border-radius: 0 8px 8px 0;
+  }
+
+  .pillar h3 { font-size: 1rem; font-weight: 600; color: var(--neutral-900); margin: 0 0 0.25rem 0; }
+  .pillar p { font-size: 0.9375rem; line-height: 1.5; color: var(--neutral-500); margin: 0; }
+
+  /* Scenario blocks */
+  .scenario-block {
+    border-left: 4px solid; padding: 1rem 1.25rem; background: #FAFAFA;
+    border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 0.75rem;
+  }
+
+  .scenario-block h3 { font-size: 1.1rem; font-weight: 600; color: var(--neutral-900); margin: 0; }
+  .scenario-block > p { font-size: 0.9rem; line-height: 1.5; color: var(--neutral-500); margin: 0; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--neutral-200); border-radius: 8px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+
+  thead { background: rgba(0,0,0,0.04); }
+
+  th {
+    text-align: left; padding: 0.5rem 0.6rem; font-weight: 600;
+    color: var(--neutral-700); border-bottom: 1px solid var(--neutral-200); white-space: nowrap;
+  }
+
+  td { padding: 0.45rem 0.6rem; color: var(--neutral-600); border-bottom: 1px solid var(--neutral-100); }
+  tr:last-child td { border-bottom: none; }
+
+  .rev-total { font-size: 0.85rem; color: var(--neutral-500); margin: 0; font-style: italic; }
+
+  #methodology p {
+    font-size: 0.9375rem; line-height: 1.65; color: var(--neutral-600); margin: 0;
+  }
+
+  #methodology a { color: var(--primary-direct); }
+
+  .page-footer { padding: 2rem; text-align: center; }
+
+  .page-footer a {
+    color: var(--neutral-500); text-decoration: none; font-size: 0.875rem;
+  }
+
+  .page-footer a:hover { color: var(--neutral-900); }
+</style>

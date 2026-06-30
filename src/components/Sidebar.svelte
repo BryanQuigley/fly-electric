@@ -1,5 +1,5 @@
 <script>
-	import { spokes, visibleSpokes, includeLayovers, selectedAirport } from "../lib/stores";
+	import { spokes, visibleSpokes, selectedAirport } from "../lib/stores";
 	import FlightStats from "/src/components/FlightStats.svelte";
 	import BarChart from '/src/components/BarChart.svelte';
 </script>
@@ -18,18 +18,9 @@
 			passengers={$visibleSpokes.direct.passengers}
 			flights={$visibleSpokes.direct.flights}
 		/>
-		{#if $includeLayovers}
-			<FlightStats 
-				label={'Layover'}
-				color={'var(--primary-layover)'}
-				passengers={$visibleSpokes.layover.passengers}
-				flights={$visibleSpokes.layover.flights}
-			/>
-		{/if}
 	</div>
 	<BarChart 
 		directFlights={$visibleSpokes.direct.flights}
-		layoverFlights={$visibleSpokes.layover.flights}
 		referenceFlights={$spokes.flights}
 	/>
 </div>

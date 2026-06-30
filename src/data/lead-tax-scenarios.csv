@@ -1,0 +1,16 @@
+scenario,year,fee,demand,revenue,behavior
+soft,2027,1.00,95,14.7,Flight schools begin testing UL94 for trainer aircraft.
+soft,2028,2.00,80,24.8,Standard Cessnas/Pipers switch; 100LL for high-power.
+soft,2029,3.00,65,30.2,The Slow Grind: high-performance owners pay the premium.
+soft,2030,4.00,45,27.9,Logistics surcharges begin; 100LL hits $11+/gal.
+soft,2031,5.00,15,11.6,Tipping point: 100LL becomes Special Order only.
+rapid,2027,1.00,90,14.0,Swift/GAMI fuels become the early-adopter choice.
+rapid,2028,2.00,70,21.7,Mass STC filing to avoid the fee.
+rapid,2029,3.00,25,11.6,TIPPING POINT: FBOs flip 100LL tanks to unleaded.
+rapid,2030,4.00,10,6.2,Logistics decay; trucking stops at small airports.
+rapid,2031,5.00,2,1.6,Ban date hits an empty market; transition complete.
+notax,2027,0.00,97,0,A few flight schools voluntarily switch to UL94.
+notax,2028,0.00,95,0,Early adopters convert; the rest wait and see.
+notax,2029,0.00,93,0,No urgency. 100LL remains at every FBO.
+notax,2030,0.00,91,0,Industry lobby pushes for a ban extension.
+notax,2031,0.00,87,0,Ban arrives; most planes still on leaded fuel.

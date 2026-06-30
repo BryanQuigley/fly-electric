@@ -1,6 +1,4 @@
 <script>
-	import LayoverCheckbox from "/src/components/LayoverCheckbox.svelte";
-
 	import { range } from "../lib/stores";
 	import { scalePow } from 'd3';
   import { onMount } from "svelte";
@@ -59,7 +57,6 @@
 	let ticks = [
 		{ range: 100, label: "100" },
 		{ range: 124, label: "HA ES-30", class: 'plane' },
-		{ range: 288, label: "Eviation Alice", class: 'plane' },
 		{ range: 460, label: "Wright Spirit", class: 'plane' },
 		{ range: 500, label: "500" },
 		{ range: 1000, label: "1000" },
@@ -99,7 +96,6 @@
 				<path d="M9.89062 5.03906L10.4297 4.5L9.89062 3.98438L6.51562 0.609375L6 0.0703125L4.92188 1.125L5.46094 1.66406L7.54688 3.75H0.75H0V5.25H0.75H7.54688L5.46094 7.35938L4.92188 7.875L6 8.95312L6.51562 8.41406L9.89062 5.03906Z" fill="black"/>
 			</svg>				
 		</h3>
-		<LayoverCheckbox />
 	</div>
 	
 	<div id="track" bind:this={track}>

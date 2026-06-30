@@ -12,7 +12,6 @@ allSpokes.features = allSpokes.features.map((spoke, id) => {
 });
 
 export const range = writable(175);
-export const includeLayovers = writable(true);
 export const selectedAirport = writable(undefined);
 
 const totalFlights = sumFlights(allSpokes.features);
@@ -45,47 +44,23 @@ export const spokes = derived(selectedAirport, $selectedAirport => {
 	}
 });
 
-// select spokes to render based on range, incl. layovers, and 
+// select spokes to render based on range
 export const visibleSpokes = derived([
 	spokes,
 	range,
-	includeLayovers,
-], ([$spokes, $range, $includeLayovers]) => {
-	// take $allSpokes
-	// sort into direct and layover flights
-	const direct = [];
-	const layover = [];
-	// filter by range (w/out) layovers
-	const selection = $spokes.spokes.filter(spoke => {
-		// can be replaced with direct?
-		if(spoke.properties.DISTANCE <= $range) {
-			direct.push(spoke);
-			return true;
-		}
-		// Show layovers?
-		if(!$includeLayovers) return false;
-		// Can be replaced with layover?
-		if(spoke.properties.layover_range!=null && spoke.properties.layover_range <= $range) {
-			layover.push(spoke);
-			return true;
-		}
-		// not replaceable at all
-		return false;
-	});
+], ([$spokes, $range]) => {
+	const direct = $spokes.spokes.filter(spoke =>
+		spoke.properties.DISTANCE <= $range
+	);
 	return {
-		spokes: selection,
-		flights: sumFlights(selection),
-		passengers: sumPassengers(selection),
-		co2: sumCO(selection),
+		spokes: direct,
+		flights: sumFlights(direct),
+		passengers: sumPassengers(direct),
+		co2: sumCO(direct),
 		direct: {
 			flights: sumFlights(direct),
 			passengers: sumPassengers(direct),
 			co2: sumCO(direct)
-		},
-		layover: {
-			flights: sumFlights(layover),
-			passengers: sumPassengers(layover),
-			co2: sumCO(layover)
 		}
 	}
 });

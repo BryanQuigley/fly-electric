@@ -1,0 +1,327 @@
+---
+import fs from 'node:fs';
+
+const csvRaw = fs.readFileSync('src/data/lead-tax-scenarios.csv', 'utf-8').trim();
+const lines = csvRaw.split('\n').slice(1);
+const rows = lines.map(l => {
+  const [scenario, year, fee, demand, revenue, ...behaviorParts] = l.split(',');
+  return {
+    scenario,
+    year: parseInt(year),
+    fee: parseFloat(fee),
+    demand: parseFloat(demand),
+    revenue: parseFloat(revenue),
+    behavior: behaviorParts.join(',').replace(/^"|"$/g, ''),
+  };
+});
+
+const scenarios = { soft: [], rapid: [], notax: [] };
+for (const r of rows) scenarios[r.scenario].push(r);
+
+const years = scenarios.soft.map(r => r.year);
+const colors = { soft: '#D94A4A', rapid: '#7A1A1A', notax: '#999999' };
+
+// Pre-compute SVG graph strings
+const W = 600, H = 240, padL = 44, padR = 12, padT = 12, padB = 34;
+const gW = W - padL - padR, gH = H - padT - padB;
+const x = (i) => Math.round(padL + (i / (years.length - 1)) * gW);
+const y = (v) => Math.round(padT + gH - (v / 100) * gH);
+
+const gridY = [0, 25, 50, 75, 100];
+const gridLines = gridY.map(p => `<line x1="${padL}" y1="${y(p)}" x2="${W - padR}" y2="${y(p)}" stroke="#E8E8E8" stroke-width="1"/>`).join('');
+const yLabels = gridY.map(p => `<text x="${padL - 6}" y="${y(p) + 4}" text-anchor="end" fill="#A1A1AA" font-size="11">${p}%</text>`).join('');
+const xLabels = years.map((yr, i) => `<text x="${x(i)}" y="${H - 9}" text-anchor="middle" fill="#A1A1AA" font-size="11">${yr}</text>`).join('');
+const feeLabels = years.map((_, i) => {
+  const f = scenarios.soft[i].fee;
+  return f > 0 ? `<text x="${x(i)}" y="${H - 9 + 14}" text-anchor="middle" fill="#CCC" font-size="9">+$${f.toFixed(0)}</text>` : '';
+}).join('');
+
+function buildLayer(key) {
+  const data = scenarios[key];
+  const pts = data.map((r, i) => `${i === 0 ? 'M' : 'L'}${x(i)},${y(r.demand)}`).join('');
+  const bot = y(0);
+  const area = `M${x(0)},${bot}${pts.slice(1)}L${x(data.length - 1)},${bot}Z`;
+  const dots = data.map((r, i) => `<circle cx="${x(i)}" cy="${y(r.demand)}" r="4" fill="${colors[key]}" stroke="#fff" stroke-width="2"/>`).join('');
+  const last = data[data.length - 1];
+  let endLabel;
+  if (last.demand < 1) {
+    endLabel = `<text x="${x(data.length - 1) - 8}" y="${y(last.demand) - 7}" text-anchor="end" fill="${colors[key]}" font-size="12" font-weight="700">&lt;1%</text>`;
+  } else if (key === 'notax') {
+    endLabel = `<text x="${x(data.length - 1) - 8}" y="${y(last.demand) - 6}" text-anchor="end" fill="${colors[key]}" font-size="11" font-weight="600">${last.demand}%</text>`;
+  } else {
+    endLabel = `<text x="${x(data.length - 1) + 8}" y="${y(last.demand) + 4}" fill="${colors[key]}" font-size="12" font-weight="700">${last.demand}%</text>`;
+  }
+  return { pts, area, dots, endLabel, color: colors[key] };
+}
+
+const layers = {};
+for (const k of ['notax', 'soft', 'rapid']) layers[k] = buildLayer(k);
+
+const svgContent = `<svg viewBox="0 0 ${W} ${H}" class="graph">
+  ${gridLines}
+  ${yLabels}
+  ${xLabels}
+  ${feeLabels}
+  <path d="${layers.notax.area}" fill="${colors.notax}" opacity="0.05"/>
+  <path d="${layers.soft.area}" fill="${colors.soft}" opacity="0.06"/>
+  <path d="${layers.rapid.area}" fill="${colors.rapid}" opacity="0.06"/>
+  <path d="${layers.notax.pts}" fill="none" stroke="${colors.notax}" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6,3"/>
+  <path d="${layers.soft.pts}" fill="none" stroke="${colors.soft}" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="${layers.rapid.pts}" fill="none" stroke="${colors.rapid}" stroke-width="2.5" stroke-linejoin="round"/>
+  ${layers.notax.dots}
+  ${layers.soft.dots}
+  ${layers.rapid.dots}
+  ${layers.notax.endLabel}
+  ${layers.soft.endLabel}
+  ${layers.rapid.endLabel}
+</svg>`;
+---
+
+<section id="tax">
+  <div class="hero-bg">
+    <div class="hero-content">
+      <span class="section-label">Action 1</span>
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+          <path d="M22 2L11 13"/>
+          <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        Tax leaded aviation fuel
+      </h2>
+      <p class="lede">
+        Avgas 100LL is the <strong>last leaded fuel</strong> sold in the United States.
+        The Green Flight Plan adds <strong>$1/gal each year</strong> to 100LL — turning a
+        voluntary phase-out into a predictable market collapse. We also propose a small excise
+        on <strong>non-SAF jet fuel</strong> to fund electric infrastructure at airports.
+      </p>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-header">
+      <h3>Scenario: what a rising fee could do</h3>
+      <p>
+        These are <strong>illustrative scenarios, not predictions</strong>. The actual outcome
+        depends on how quickly unleaded alternatives reach the market. The CSV data file at
+        <code>src/data/lead-tax-scenarios.csv</code> can be edited to explore different assumptions.
+        <a href="/about#scenarios">See full scenario tables →</a>
+      </p>
+    </div>
+
+    <!-- Graph -->
+    <div class="graph-card">
+      <div class="graph-head">
+        <h4>100LL demand under a rising fee</h4>
+        <div class="graph-legend">
+          <span class="legend-line soft"></span> Soft Landing
+          <span class="legend-line rapid"></span> Rapid Collapse
+          <span class="legend-line notax"></span> No Tax
+        </div>
+      </div>
+      <div class="graph-wrap" set:html={svgContent}></div>
+    </div>
+
+    <div class="scenario-labels">
+      <div class="slabel">
+        <span class="slabel-dot" style="background:{colors.soft}"></span>
+        <strong>{scenarios.soft[0].demand}% → {scenarios.soft[scenarios.soft.length-1].demand}%</strong>
+        <span>Soft Landing &mdash; UL94 dominates, gradual phase-out</span>
+      </div>
+      <div class="slabel">
+        <span class="slabel-dot" style="background:{colors.rapid}"></span>
+        <strong>{scenarios.rapid[0].demand}% → {scenarios.rapid[scenarios.rapid.length-1].demand}%</strong>
+        <span>Rapid Collapse &mdash; Drop-in unleaded, market tips at $3</span>
+      </div>
+      <div class="slabel">
+        <span class="slabel-dot" style="background:{colors.notax}"></span>
+        <strong>{scenarios.notax[0].demand}% → {scenarios.notax[scenarios.notax.length-1].demand}%</strong>
+        <span>No Tax &mdash; Voluntary transition, demand barely moves</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B94A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <p>The 2031 ban arrives either way &mdash; with or without a tax. A rising fee ensures the transition happens <em>before</em> the deadline, not in a panic at the last minute.</p>
+    </div>
+
+    <!-- Non-SAF jet fuel tax note -->
+    <div class="jet-tax-note">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B94A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <div>
+        <strong>Also proposed:</strong> A small excise on non-SAF jet fuel (Jet-A without a certified SAF blend). Even $0.25/gal would raise ~$400M/yr for electric charging infrastructure at airports — without affecting airlines already blending SAF.
+      </div>
+    </div>
+
+    <!-- Case for action -->
+    <div class="case">
+      <h3>Why this matters</h3>
+      <div class="reasons">
+        <div class="reason">
+          <span class="num">1</span>
+          <div>
+            <h3>Public health</h3>
+            <p>No safe blood-lead level exists. Children near GA airports show elevated lead levels linked to reduced IQ. The EPA formally found in 2023 that aircraft lead emissions endanger public health.</p>
+          </div>
+        </div>
+        <div class="reason">
+          <span class="num">2</span>
+          <div>
+            <h3>Market signal</h3>
+            <p>A predictable rising fee forces engine manufacturers and fuel suppliers to finally scale up unleaded alternatives (G100UL, Swift Fuel, Mogas STCs) instead of dragging their feet.</p>
+          </div>
+        </div>
+        <div class="reason">
+          <span class="num">3</span>
+          <div>
+            <h3>Revenue for transition</h3>
+            <p>Combined revenue from the 100LL fee and non-SAF jet tax can fund electric retrofits, charging infrastructure at GA and commercial airports, and R&amp;D for next-gen propulsion.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  section { display: flex; flex-direction: column; align-items: center; }
+
+  .hero-bg {
+    width: 100%;
+    background: linear-gradient(135deg, #3B0D0D 0%, #7A1A1A 40%, #B94A4A 100%);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 5rem 1.25rem;
+  }
+
+  .hero-content { max-width: 720px; display: flex; flex-direction: column; gap: 1rem; }
+
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; opacity: 0.6;
+  }
+
+  .hero-content h2 {
+    font-size: 2.5rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0; line-height: 1.15; display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .hero-content .lede {
+    font-size: 1.125rem; line-height: 1.65; margin: 0; opacity: 0.9; max-width: 600px;
+  }
+
+  .hero-content .lede strong { color: #FFB3B3; }
+
+  .content {
+    max-width: 720px; display: flex; flex-direction: column; gap: 2.5rem; padding: 4rem 1.25rem;
+  }
+
+  .section-header h3 {
+    font-size: 1.5rem; font-weight: 500; color: var(--neutral-900);
+    margin: 0 0 0.75rem 0; letter-spacing: -0.02em;
+  }
+
+  .section-header p {
+    font-size: 1rem; line-height: 1.6; color: var(--neutral-500); margin: 0;
+  }
+
+  .section-header a { color: #B94A4A; }
+
+  .section-header code {
+    background: var(--neutral-200); padding: 1px 5px; border-radius: 3px; font-size: 0.85rem;
+  }
+
+  /* Graph */
+  .graph-card {
+    border: 1px solid var(--neutral-200); border-radius: 12px; padding: 1.5rem; background: #fff;
+  }
+
+  .graph-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+  }
+
+  .graph-head h4 { font-size: 1rem; font-weight: 600; color: var(--neutral-700); margin: 0; }
+
+  .graph-legend {
+    display: flex; align-items: center; gap: 1.25rem; font-size: 0.8125rem; color: var(--neutral-500);
+  }
+
+  .legend-line {
+    display: inline-block; width: 18px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle;
+  }
+
+  .legend-line.soft { background: #D94A4A; }
+  .legend-line.rapid { background: #7A1A1A; }
+  .legend-line.notax { background: #999999; }
+
+  .graph-wrap { width: 100%; }
+  .graph { width: 100%; height: auto; display: block; }
+
+  /* Scenario labels */
+  .scenario-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .slabel {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+  }
+
+  .slabel-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .slabel strong {
+    font-size: 0.9rem;
+    color: var(--neutral-900);
+    white-space: nowrap;
+    min-width: 5em;
+  }
+
+  /* Callout */
+  .callout {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    padding: 1rem 1.25rem; background: #FFF5F0; border: 1px solid #FFD6C0;
+    border-radius: 10px; font-size: 0.9375rem; line-height: 1.5; color: #7A3A1A;
+  }
+
+  .callout svg { flex-shrink: 0; margin-top: 2px; }
+
+  /* Jet tax */
+  .jet-tax-note {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    padding: 1rem 1.25rem; background: #FFF5F0; border: 1px solid #FFD6C0;
+    border-radius: 10px; font-size: 0.9375rem; line-height: 1.5; color: #7A3A1A;
+  }
+
+  .jet-tax-note svg { flex-shrink: 0; margin-top: 2px; }
+  .jet-tax-note strong { color: #B94A4A; }
+
+  .case h3 { font-size: 1.5rem; font-weight: 500; color: var(--neutral-900); margin: 0 0 1.25rem 0; letter-spacing: -0.02em; }
+
+  .reasons { display: flex; flex-direction: column; gap: 1.25rem; }
+  .reason { display: flex; gap: 1rem; align-items: flex-start; }
+
+  .num {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+    background: #B94A4A; color: #fff; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; font-weight: 600;
+  }
+
+  .reason h3 { font-size: 1rem; font-weight: 600; color: var(--neutral-900); margin: 0 0 0.25rem 0; }
+  .reason p { font-size: 0.9375rem; line-height: 1.5; color: var(--neutral-500); margin: 0; }
+</style>
